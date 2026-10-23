@@ -23,16 +23,15 @@ jobs:
         run: |
           echo "Starting high-speed secure direct download..."
           
-          # 1. 키 파일 다운로드 (구글 일반 다운로드)
+          # 1. 키 파일 다운로드
           gdown "19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75" -O "prod.keys"
           
-          # 2. 업데이트 파일 다운로드 (구글 일반 다운로드)
+          # 2. 업데이트 파일 다운로드
           gdown "1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY" -O "Update.nsp"
           
-          # 3. 게임 본편 파일 다운로드 (구글 대용량 확인 팝업창 강제 우회 마스터 키)
-          # 구글 서버가 뿜는 보안 확인 코드를 실시간으로 파싱하여 17.5GB 진짜 알맹이 데이터만 순도 100%로 긁어옵니다.
-          CONFIRM_CODE=$(curl -sc /tmp/gcookie "https://google.com" | grep -o 'confirm=[^&]*' | head -n 1 | cut -d= -f2)
-          curl -Lb /tmp/gcookie "https://google.com{CONFIRM_CODE}&id=1X04IOFkkWAmlR3ZgWGTJTrL31iTYNI-v" -o "Game.xci"
+          # 3. 게임 본편 파일 다운로드 (gdown의 대용량 보안 경고창 자동 처리 기능 활용)
+          # 주소 기호가 유실될 위험이 없는 가장 확실한 표준 다운로드 방식입니다.
+          gdown --id "1X04IOFkkWAmlR3ZgWGTJTrL31iTYNI-v" -O "Game.xci" --no-cookies
           
           echo "=================================================="
           echo "Download complete! Verifying actual file sizes:"
