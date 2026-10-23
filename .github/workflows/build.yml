@@ -1,0 +1,30 @@
+name: Build MacNativeGames IPA
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download Switch Game and Keys
+        run: |
+          # ⚠️ 여기에 구글 드라이브나 클라우드에 올린 젤다 파일과 prod.keys 다운로드 명령어를 넣을 예정입니다.
+          echo "Downloading files..."
+
+      - name: Run Build Script
+        run: |
+          python3 build_app.py "The Legend of Zelda Tears of the Kingdom.xci" -k prod.keys --update "The Legend of Zelda Tears of the Kingdom [Update v1.4.3].nsp" --platform ios
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZeldaTotK-IPA
+          path: "*.ipa"
