@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-latest   # 깃허브가 제공하는 가장 최신 사양의 가상 Mac 컴퓨터를 빌립니다.
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
           # 2. 업데이트 파일 다운로드
           gdown "1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY" -O "The Legend of Zelda Tears of the Kingdom [Update v1.4.3].nsp"
           
-          # 3. 게임 본편 파일 다운로드 (에러를 일으키는 모든 옵션 제거)
+          # 3. 게임 본편 파일 다운로드
           gdown "1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz" -O "The Legend of Zelda Tears of the Kingdom.xci"
           
           echo "Download complete! Verifying files..."
