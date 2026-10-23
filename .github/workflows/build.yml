@@ -29,8 +29,8 @@ jobs:
           # 2. 업데이트 파일 다운로드
           gdown "1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY" -O "The Legend of Zelda Tears of the Kingdom [Update v1.4.3].nsp"
           
-          # 3. 게임 본편 파일 다운로드
-          gdown "1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz" -O "The Legend of Zelda Tears of the Kingdom.xci"
+          # 3. 게임 본편 사본 파일 다운로드 (트래픽 제한 해제된 새 주소 반영)
+          gdown "1X04IOFkkWAmlR3ZgWGTJTrL31iTYNI-v" -O "The Legend of Zelda Tears of the Kingdom.xci"
           
           echo "Download complete! Verifying files..."
           ls -lh
