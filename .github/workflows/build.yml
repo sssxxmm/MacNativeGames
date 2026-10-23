@@ -16,8 +16,18 @@ jobs:
 
       - name: Download Switch Game and Keys
         run: |
-          # ⚠️ 여기에 구글 드라이브나 클라우드에 올린 젤다 파일과 prod.keys 다운로드 명령어를 넣을 예정입니다.
-          echo "Downloading files..."
+          echo "Starting high-speed cloud download..."
+          # 키 파일 다운로드
+          curl -L "https://google.com" -o "prod.keys"
+          
+          # 업데이트 파일 다운로드
+          curl -L "https://google.com" -o "The Legend of Zelda Tears of the Kingdom [Update v1.4.3].nsp"
+          
+          # 게임 본편 파일 다운로드 (대용량 우회 스크립트 적용)
+          curl -L "https://google.com(curl -sL 'https://google.com' | grep -o 'confirm=[^&]*' | head -n 1 | cut -d= -f2)&id=1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz" -o "The Legend of Zelda Tears of the Kingdom.xci"
+          
+          echo "Download complete! Verifying files..."
+          ls -lh
 
       - name: Run Build Script
         run: |
