@@ -14,20 +14,52 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Download Switch Game and Keys
+      - name: Install Requests for Python
         run: |
-          echo "Starting secure direct download..."
-          
+          python3 -m pip install requests
+
+      - name: Download Switch Game and Keys via Python
+        shell: python
+        run: |
+          import requests
+          import os
+
+          def download_gdrive_large(file_id, destination):
+              print(f"Starting download for ID {file_id} -> {destination}")
+              URL = "https://google.com"
+              session = requests.Session()
+              
+              # 1차 요청으로 토큰 확인
+              response = session.get(URL, params={'id': file_id}, stream=True)
+              token = None
+              for key, value in response.cookies.items():
+                  if key.startswith('download_warning'):
+                      token = value
+                      break
+              
+              # 팝업 확인 토큰이 있다면 주소에 포함시켜 재요청
+              if token:
+                  response = session.get(URL, params={'id': file_id, 'confirm': token}, stream=True)
+              
+              # 파일 저장
+              with open(destination, "wb") as f:
+                  for chunk in response.iter_content(32768):
+                      if chunk:
+                          f.write(chunk)
+              print(f"Finished downloading {destination}. Size: {os.path.getsize(destination)} bytes")
+
           # 1. 키 파일 다운로드
-          curl -L "https://google.com" -o "prod.keys"
+          download_gdrive_large("19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75", "prod.keys")
           
           # 2. 업데이트 파일 다운로드
-          curl -L "https://google.com" -o "Update.nsp"
+          download_gdrive_large("1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY", "Update.nsp")
           
-          # 3. 게임 본편 파일 다운로드 (대용량 우회 주소 결합)
-          curl -L "https://google.com(curl -sL 'https://google.com' | grep -o 'confirm=[^&]*' | head -n 1 | cut -d= -f2)&id=1X04IOFkkWAmlR3ZgWGTJTrL31iTYNI-v" -o "Game.xci"
-          
-          echo "Download complete! Checked files list:"
+          # 3. 게임 본편 사본 파일 다운로드
+          download_gdrive_large("1X04IOFkkWAmlR3ZgWGTJTrL31iTYNI-v", "Game.xci")
+
+      - name: Verify Downloaded Files
+        run: |
+          echo "Checking files in folder:"
           ls -lh
 
       - name: Install Required Packages (Homebrew)
@@ -37,7 +69,6 @@ jobs:
 
       - name: Run Build Script
         run: |
-          # 다운로드된 Game.xci와 Update.nsp라는 직관적인 이름으로 빌드를 수행합니다.
           python3 build_app.py "Game.xci" -k prod.keys --update "Update.nsp" --platform ios
 
       - name: Upload IPA Artifact
