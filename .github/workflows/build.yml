@@ -4,7 +4,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest   # 깃허브가 제공하는 가장 최신 사양의 가상 Mac 컴퓨터를 빌립니다.
+    runs-on: macos-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,6 +34,11 @@ jobs:
           
           echo "Download complete! Verifying files..."
           ls -lh
+
+      - name: Install Required Packages (Homebrew)
+        run: |
+          echo "Installing missing opus and libvpx packages..."
+          brew install opus libvpx
 
       - name: Run Build Script
         run: |
