@@ -14,52 +14,25 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Requests for Python
+      - name: Install Google Drive Downloader
         run: |
-          python3 -m pip install requests
+          python3 -m pip install --upgrade pip
+          pip install gdown
 
-      - name: Download Switch Game and Keys via Python
-        shell: python
+      - name: Download Switch Game and Keys
         run: |
-          import requests
-          import os
-
-          def download_gdrive_large(file_id, destination):
-              print(f"Starting download for ID {file_id} -> {destination}")
-              URL = "https://google.com"
-              session = requests.Session()
-              
-              # 1차 요청으로 토큰 확인
-              response = session.get(URL, params={'id': file_id}, stream=True)
-              token = None
-              for key, value in response.cookies.items():
-                  if key.startswith('download_warning'):
-                      token = value
-                      break
-              
-              # 팝업 확인 토큰이 있다면 주소에 포함시켜 재요청
-              if token:
-                  response = session.get(URL, params={'id': file_id, 'confirm': token}, stream=True)
-              
-              # 파일 저장
-              with open(destination, "wb") as f:
-                  for chunk in response.iter_content(32768):
-                      if chunk:
-                          f.write(chunk)
-              print(f"Finished downloading {destination}. Size: {os.path.getsize(destination)} bytes")
-
-          # 1. 키 파일 다운로드
-          download_gdrive_large("19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75", "prod.keys")
+          echo "Starting secure direct download..."
           
-          # 2. 업데이트 파일 다운로드
-          download_gdrive_large("1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY", "Update.nsp")
+          # 1. 키 파일 다운로드 (구글)
+          gdown "19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75" -O "prod.keys"
           
-          # 3. 게임 본편 사본 파일 다운로드
-          download_gdrive_large("1X04IOFkkWAmlR3ZgWGTJTrL31iTYNI-v", "Game.xci")
-
-      - name: Verify Downloaded Files
-        run: |
-          echo "Checking files in folder:"
+          # 2. 업데이트 파일 다운로드 (구글)
+          gdown "1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY" -O "Update.nsp"
+          
+          # 3. 게임 본편 파일 다운로드 (토피쉐어 최종 전체 ID 반영)
+          curl -L "https://toffeeshare.com" -o "Game.xci"
+          
+          echo "Download complete! Checked files list:"
           ls -lh
 
       - name: Install Required Packages (Homebrew)
