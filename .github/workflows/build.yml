@@ -22,13 +22,12 @@ jobs:
           curl -L "https://google.com" -o "prod.keys"
           
           # 2. 업데이트 파일 다운로드
-          curl -L "https://google.com" -o "The Legend of Zelda Tears of the Kingdom [Update v1.4.3].nsp"
+          curl -L "https://google.com" -o "Update.nsp"
           
-          # 3. 게임 본편 파일 다운로드 (대용량 확인 팝업 자동 우회 명령어)
-          CONFIRM=$(curl -sc /tmp/gcookie "https://google.com" | grep -o 'confirm=[^&]*' | head -n 1 | cut -d= -f2)
-          curl -Lb /tmp/gcookie "https://google.com" -o "The Legend of Zelda Tears of the Kingdom.xci"
+          # 3. 게임 본편 파일 다운로드 (대용량 우회 주소 결합)
+          curl -L "https://google.com(curl -sL 'https://google.com' | grep -o 'confirm=[^&]*' | head -n 1 | cut -d= -f2)&id=1X04IOFkkWAmlR3ZgWGTJTrL31iTYNI-v" -o "Game.xci"
           
-          echo "Download complete! Verifying files..."
+          echo "Download complete! Checked files list:"
           ls -lh
 
       - name: Install Required Packages (Homebrew)
@@ -38,7 +37,8 @@ jobs:
 
       - name: Run Build Script
         run: |
-          python3 build_app.py "The Legend of Zelda Tears of the Kingdom.xci" -k prod.keys --update "The Legend of Zelda Tears of the Kingdom [Update v1.4.3].nsp" --platform ios
+          # 다운로드된 Game.xci와 Update.nsp라는 직관적인 이름으로 빌드를 수행합니다.
+          python3 build_app.py "Game.xci" -k prod.keys --update "Update.nsp" --platform ios
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
