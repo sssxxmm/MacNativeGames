@@ -14,23 +14,19 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Google Drive Downloader
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install gdown
-
       - name: Download Switch Game and Keys
         run: |
-          echo "Starting high-speed cloud download..."
+          echo "Starting secure direct download..."
           
           # 1. 키 파일 다운로드
-          gdown "19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75" -O "prod.keys"
+          curl -L "https://google.com" -o "prod.keys"
           
           # 2. 업데이트 파일 다운로드
-          gdown "1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY" -O "The Legend of Zelda Tears of the Kingdom [Update v1.4.3].nsp"
+          curl -L "https://google.com" -o "The Legend of Zelda Tears of the Kingdom [Update v1.4.3].nsp"
           
-          # 3. 게임 본편 사본 파일 다운로드 (트래픽 제한 해제된 새 주소 반영)
-          gdown "1X04IOFkkWAmlR3ZgWGTJTrL31iTYNI-v" -O "The Legend of Zelda Tears of the Kingdom.xci"
+          # 3. 게임 본편 파일 다운로드 (대용량 확인 팝업 자동 우회 명령어)
+          CONFIRM=$(curl -sc /tmp/gcookie "https://google.com" | grep -o 'confirm=[^&]*' | head -n 1 | cut -d= -f2)
+          curl -Lb /tmp/gcookie "https://google.com" -o "The Legend of Zelda Tears of the Kingdom.xci"
           
           echo "Download complete! Verifying files..."
           ls -lh
