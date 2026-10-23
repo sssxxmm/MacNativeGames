@@ -14,27 +14,61 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Google Drive Downloader
+      - name: Install Requests
         run: |
-          python3 -m pip install --upgrade pip
-          pip install gdown
+          python3 -m pip install requests gdown
 
       - name: Download Switch Game and Keys
+        shell: python
         run: |
-          echo "Starting high-speed secure direct download..."
+          import requests
+          import re
+          import os
+          import subprocess
+
+          # 1. 키 파일 및 업데이트 다운로드 (gdown 활용)
+          print("Downloading keys and update...")
+          subprocess.run(['gdown', '19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75', '-O', 'prod.keys'])
+          subprocess.run(['gdown', '1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY', '-O', 'Update.nsp'])
+
+          # 2. 게임 본편 파일 다운로드 (구글 대용량 차단 우회 파이썬 스크립트)
+          file_id = "1X04IOFkkWAmlR3ZgWGTJTrL31iTYNI-v"
+          destination = "Game.xci"
           
-          # 1. 키 파일 다운로드 (구글 일반 다운로드)
-          gdown "19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75" -O "prod.keys"
+          print(f"Starting secure direct download for Game.xci (ID: {file_id})...")
+          URL = "https://google.com"
+          session = requests.Session()
           
-          # 2. 업데이트 파일 다운로드 (구글 일반 다운로드)
-          gdown "1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY" -O "Update.nsp"
+          # 1차 요청으로 경고창 확인 토큰 굽기
+          response = session.get(URL, params={'id': file_id}, stream=True)
+          token = None
+          for key, value in response.cookies.items():
+              if key.startswith('download_warning'):
+                  token = value
+                  break
           
-          # 3. 게임 본편 파일 다운로드 (구글 보안 확인창 및 대역폭 제한 강제 무력화 커스텀 주소)
-          # 유저님의 구글 드라이브 본편 사본 파일 식별자를 다이렉트 바이너리 세션으로 강제 전환하여 전송합니다.
-          curl -L "https://google.com(curl -sL 'https://google.com' | grep -o 'confirm=[^&]*' | head -n 1 | cut -d= -f2)&id=1X04IOFkkWAmlR3ZgWGTJTrL31iTYNI-v" -o "Game.xci"
+          # 토큰이 있다면 주소에 결합하여 17.5GB 진짜 알맹이 데이터 다이렉트 전송 요청
+          params = {'id': file_id}
+          if token:
+              params['confirm'] = token
           
+          response = session.get(URL, params=params, stream=True)
+          
+          # 파일 저장 진행 상황 출력하며 기록
+          total_bytes = 0
+          with open(destination, "wb") as f:
+              for chunk in response.iter_content(chunk_size=1024*1024): # 1MB 단위
+                  if chunk:
+                      f.write(chunk)
+                      total_bytes += len(chunk)
+                      if total_bytes % (1024*1024*500) == 0: # 500MB마다 로그 출력
+                          print(f"Downloaded: {total_bytes // (1024*1024)} MB...")
+                          
+          print(f"Download complete! Final size: {os.path.getsize(destination)} bytes")
+
+      - name: Verify Folder Content
+        run: |
           echo "=================================================="
-          echo "Download complete! Verifying actual file sizes:"
           ls -lh
           echo "=================================================="
 
@@ -46,13 +80,11 @@ jobs:
       - name: Force Hardware Bypass
         run: |
           echo "Bypassing Apple Silicon Hardware Verification Logic..."
-          # 가상 컴퓨터 환경에 구애받지 않도록 하드웨어 조건 검사들을 전부 True(참)로 강제 개조합니다.
           sed -i '' 's/platform.machine() == "arm64"/True/g' build_app.py
           sed -i '' 's/sys.platform == "darwin"/True/g' build_app.py
 
       - name: Run Build Script
         run: |
-          # 온전하게 받아진 17.5GB 원본 파일 구조를 해체하여 아이패드용 네이티브 앱 파일로 조립합니다.
           python3 build_app.py "Game.xci" -k prod.keys --update "Update.nsp" --platform ios
 
       - name: Upload IPA Artifact
@@ -60,4 +92,3 @@ jobs:
         with:
           name: ZeldaTotK-IPA
           path: "*.ipa"
-
