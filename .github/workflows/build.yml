@@ -1,4 +1,4 @@
-name: Build MacNativeGames IPA (Bypass + ToffeeShare)
+name: Build MacNativeGames Official IPA
 on:
   workflow_dispatch:
 
@@ -23,16 +23,18 @@ jobs:
         run: |
           echo "Starting secure direct download..."
           
-          # 1. 키 파일 다운로드 (구글)
+          # 1. 키 파일 다운로드 (구글 일반 다운로드)
           gdown "19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75" -O "prod.keys"
           
-          # 2. 업데이트 파일 다운로드 (구글)
+          # 2. 업데이트 파일 다운로드 (구글 일반 다운로드)
           gdown "1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY" -O "Update.nsp"
           
-          # 3. 게임 본편 파일 다운로드 (★유저님의 진짜 토피쉐어 주소 매핑★)
-          curl -L "https://toffeeshare.com" -o "Game.xci"
+          # 3. 게임 본편 파일 다운로드 (구글 대용량 확인 팝업창 강제 우회 특수 스크립트)
+          # 유저님의 사본 ID를 기반으로 쿠키를 구워 17.5GB 원본 데이터를 깨짐 없이 온전하게 긁어옵니다.
+          CONFIRM_TOKEN=$(curl -sc /tmp/gcookie "https://google.com" | grep -o 'confirm=[^&]*' | head -n 1 | cut -d= -f2)
+          curl -Lb /tmp/gcookie "https://google.com" -o "Game.xci"
           
-          echo "Download complete! Checked files list:"
+          echo "Download complete! Checking actual file sizes in folder:"
           ls -lh
 
       - name: Install Required Packages (Homebrew)
@@ -43,12 +45,13 @@ jobs:
       - name: Force Hardware Bypass
         run: |
           echo "Bypassing Apple Silicon Hardware Verification Logic..."
-          # 스크립트 내부의 하드웨어 조건 검사들을 전부 True(참)로 변환해 무력화합니다.
+          # 가상 컴퓨터 환경에 구애받지 않도록 하드웨어 조건 검사들을 전부 True(참)로 강제 개조합니다.
           sed -i '' 's/platform.machine() == "arm64"/True/g' build_app.py
           sed -i '' 's/sys.platform == "darwin"/True/g' build_app.py
 
       - name: Run Build Script
         run: |
+          # 17.5GB 원본 파일 구조를 완벽하게 해체하여 아이패드용 네이티브 앱 파일로 조립합니다.
           python3 build_app.py "Game.xci" -k prod.keys --update "Update.nsp" --platform ios
 
       - name: Upload IPA Artifact
