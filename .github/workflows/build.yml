@@ -23,14 +23,14 @@ jobs:
         run: |
           echo "Starting high-speed cloud download..."
           
-          # 1. 키 파일 다운로드 (옵션 글자 없이 ID만 직접 지정)
+          # 1. 키 파일 다운로드
           gdown "19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75" -O "prod.keys"
           
           # 2. 업데이트 파일 다운로드
           gdown "1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY" -O "The Legend of Zelda Tears of the Kingdom [Update v1.4.3].nsp"
           
-          # 3. 게임 본편 파일 다운로드 (대용량 우회 옵션 적용)
-          gdown "1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz" -O "The Legend of Zelda Tears of the Kingdom.xci" --remaining-ok
+          # 3. 게임 본편 파일 다운로드 (에러를 일으키는 모든 옵션 제거)
+          gdown "1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz" -O "The Legend of Zelda Tears of the Kingdom.xci"
           
           echo "Download complete! Verifying files..."
           ls -lh
@@ -44,4 +44,3 @@ jobs:
         with:
           name: ZeldaTotK-IPA
           path: "*.ipa"
-
