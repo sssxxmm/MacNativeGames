@@ -19,22 +19,16 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install gdown requests
 
-      - name: Download Switch Game and Keys
-        shell: python
+      - name: Download Switch Game, Update and Keys
         run: |
-          import subprocess
-          import os
-
-          print("Starting fast emergency fallback session...")
+          # 1. 키 파일 다운로드 (기존 파일 유지)
+          gdown 19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75 -O prod.keys
           
-          # 1. 키 파일 다운로드 (용량이 아주 작으므로 안정적인 gdown 유지)
-          subprocess.run(['gdown', '19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75', '-O', 'prod.keys'])
+          # 2. 본편 대용량 XCI 다운로드 (제공해주신 구글 드라이브 ID 반영)
+          gdown --remaining-ok 1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz -O Game.xci
           
-          # 2. 폰트 에러 및 트래픽 초과를 원천 차단하기 위한 예비 바이너리 강제 캐싱
-          destination = "Game.xci"
-          with open(destination, "wb") as f:
-              f.write(b"PFS0\x00\x00\x00\x00" + b"\x00" * 1024)
-          print("Emergency fallback token injection success.")
+          # 3. v1.4.3 업데이트 NSP 다운로드 (제공해주신 구글 드라이브 ID 반영)
+          gdown --remaining-ok 1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY -O Update.nsp
 
       - name: Verify Folder Content
         run: |
@@ -56,11 +50,14 @@ jobs:
 
       - name: Run Build Script
         run: |
-          # 폰트 에러를 유발하는 --update 옵션을 완전히 삭제하여 본편 단독 구조로 강제 빌드합니다.
-          python3 build_app.py "Game.xci" -k prod.keys --platform ios
+          # 다운로드받은 본편(Game.xci)과 업데이트(Update.nsp)를 결합하여 iOS용으로 빌드합니다.
+          # 만약 빌드 도중 서명 에러가 나면 프로젝트 지원 여부에 따라 맨 뒤에 --no-sign 옵션을 붙여보세요.
+          python3 build_app.py "Game.xci" -k prod.keys --update "Update.nsp" --platform ios
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ZeldaTotK-IPA
-          path: "*.ipa"
+          path: |
+            *.ipa
+            build/
