@@ -48,11 +48,12 @@ jobs:
           sed -i '' 's/platform.machine() == "arm64"/True/g' build_app.py
           sed -i '' 's/sys.platform == "darwin"/True/g' build_app.py
 
-      - name: Run Build Script
+            - name: Run Build Script
         run: |
-          # 다운로드받은 본편(Game.xci)과 업데이트(Update.nsp)를 결합하여 iOS용으로 빌드합니다.
-          # 만약 빌드 도중 서명 에러가 나면 프로젝트 지원 여부에 따라 맨 뒤에 --no-sign 옵션을 붙여보세요.
           python3 build_app.py "Game.xci" -k prod.keys --update "Update.nsp" --platform ios
+          
+          # 빌드가 끝나면 용량 확보를 위해 원본 대용량 파일들을 즉시 삭제합니다.
+          rm -f Game.xci Update.nsp
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
