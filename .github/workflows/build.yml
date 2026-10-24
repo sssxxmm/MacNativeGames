@@ -21,9 +21,14 @@ jobs:
 
       - name: Download Switch Game, Update and Keys
         run: |
+          # 1. 키 파일 다운로드
           gdown 19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75 -O prod.keys
-          gdown --fuzzy 1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz -O Game.xci
-          gdown --fuzzy 1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY -O Update.nsp
+          
+          # 2. 본편 대용량 XCI 다운로드 (에러 유발 옵션 제거)
+          gdown 1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz -O Game.xci
+          
+          # 3. v1.4.3 업데이트 NSP 다운로드 (에러 유발 옵션 제거)
+          gdown 1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY -O Update.nsp
 
       - name: Verify Folder Content
         run: |
@@ -45,7 +50,10 @@ jobs:
 
       - name: Run Build Script
         run: |
+          # 다운로드 완료된 파일들로 패키징을 시작합니다.
           python3 build_app.py "Game.xci" -k prod.keys --update "Update.nsp" --platform ios
+          
+          # 가상 머신 용량 확보를 위해 원본 파일 제거
           rm -f Game.xci Update.nsp
 
       - name: Upload IPA Artifact
