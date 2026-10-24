@@ -19,16 +19,16 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install gdown requests
 
-      - name: Download Switch Game, Update and Keys
+           - name: Download Switch Game, Update and Keys
         run: |
-          # 1. 키 파일 다운로드 (기존 파일 유지)
+          # 1. 키 파일 다운로드
           gdown 19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75 -O prod.keys
           
-          # 2. 본편 대용량 XCI 다운로드 (제공해주신 구글 드라이브 ID 반영)
-          gdown --remaining-ok 1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz -O Game.xci
+          # 2. 본편 대용량 XCI 다운로드 (--remaining-ok 대신 --fuzzy 사용)
+          gdown --fuzzy 1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz -O Game.xci
           
-          # 3. v1.4.3 업데이트 NSP 다운로드 (제공해주신 구글 드라이브 ID 반영)
-          gdown --remaining-ok 1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY -O Update.nsp
+          # 3. v1.4.3 업데이트 NSP 다운로드
+          gdown --fuzzy 1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY -O Update.nsp
 
       - name: Verify Folder Content
         run: |
