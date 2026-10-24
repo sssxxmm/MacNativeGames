@@ -19,15 +19,10 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install gdown requests
 
-           - name: Download Switch Game, Update and Keys
+      - name: Download Switch Game, Update and Keys
         run: |
-          # 1. 키 파일 다운로드
           gdown 19fxV0Z_ZR6WKpPnZT9aPSdIU8DKjGy75 -O prod.keys
-          
-          # 2. 본편 대용량 XCI 다운로드 (--remaining-ok 대신 --fuzzy 사용)
           gdown --fuzzy 1x33a_wF7vz_Yk2mT7vsa7qCvZuRWe0Bz -O Game.xci
-          
-          # 3. v1.4.3 업데이트 NSP 다운로드
           gdown --fuzzy 1XKAD07BrUYlJVCqC2NDjxzSHDhGC6dbY -O Update.nsp
 
       - name: Verify Folder Content
@@ -48,11 +43,9 @@ jobs:
           sed -i '' 's/platform.machine() == "arm64"/True/g' build_app.py
           sed -i '' 's/sys.platform == "darwin"/True/g' build_app.py
 
-            - name: Run Build Script
+      - name: Run Build Script
         run: |
           python3 build_app.py "Game.xci" -k prod.keys --update "Update.nsp" --platform ios
-          
-          # 빌드가 끝나면 용량 확보를 위해 원본 대용량 파일들을 즉시 삭제합니다.
           rm -f Game.xci Update.nsp
 
       - name: Upload IPA Artifact
